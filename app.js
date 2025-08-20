@@ -1,0 +1,49 @@
+const admin = require("firebase-admin");
+const serviceAccount = require("./config/serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+
+const app = express();
+
+// Import des routes
+const profilRoutes = require("./src/routes/profil.routes");
+const utilisateurRoutes = require("./src/routes/utilisateur.routes");
+const administrateurRoutes = require("./src/routes/administrateur.routes");
+const restaurantRoutes = require("./src/routes/restaurant.routes");
+const evenementRoutes = require("./src/routes/evenement.routes");
+const activitesRoutes = require("./src/routes/activites.routes");
+const reservationsRoutes = require("./src/routes/reservation.routes");
+const hotelRoutes = require("./src/routes/hotel.routes");
+
+
+// Middlewares
+app.use(cors());
+app.use(express.json());
+app.use(bodyParser.json());
+
+// Montage des routes
+app.use("/api/profil", profilRoutes);
+app.use("/api/utilisateurs", utilisateurRoutes);
+app.use("/api/admin", administrateurRoutes);
+app.use("/api/restaurants", restaurantRoutes);
+app.use("/api/hotels", hotelRoutes);
+app.use("/api/evenements", evenementRoutes);
+app.use("/api/activites", activitesRoutes);
+app.use("/api/reservations", reservationsRoutes);
+
+// Routes de test simples
+app.get("/", (req, res) => {
+  res.send("Bienvenue sur l'API !");
+});
+
+// Démarrage du serveur
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Serveur démarré à l'adresse : http://localhost:${PORT}`);
+});
