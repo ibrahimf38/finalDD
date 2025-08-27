@@ -1,3 +1,4 @@
+/*
 const {
     auth,
     admin,
@@ -5,10 +6,46 @@ const {
     signInWithEmailAndPassword,
     sendEmailVerification
 } = require('../../services/firebase');
+const Personne = require('../../models/Personne');
+
 
 class AuthController {
 
     async registerUser(req, res) {
+        try {
+            const { nom, email, motDePasse, telephone, adresse, role } = req.body;
+
+            if (!email || !motDePasse) {
+                return res.status(422).json({ error: "Email et mot de passe requis" });
+            }
+
+            // 1. Créer l’utilisateur Firebase
+            const userCredential = await createUserWithEmailAndPassword(auth, email, motDePasse);
+            const user = userCredential.user;
+
+            // 2. Enregistrer aussi en base dans la table "personne"
+            await Personne.create({
+                id: user.uid,       // uid Firebase comme clé primaire
+                nom,
+                email,
+                telephone,
+                adresse,
+                mot_de_passe: motDePasse, // ⚠️ à hasher avec bcrypt !
+                role: role || "USER"
+            });
+
+            res.status(201).json({
+                message: "Utilisateur créé dans Firebase + Base de données",
+                userId: user.uid
+            });
+
+        } catch (error) {
+            console.error("Erreur inscription :", error);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+   /!* async registerUser(req, res) {
         try {
             const { email, motDePasse, nom } = req.body;
 
@@ -46,7 +83,7 @@ class AuthController {
                 details: error.message
             });
         }
-    }
+    }*!/
 
     async loginUser(req, res) {
         try {
@@ -135,6 +172,134 @@ class AuthController {
         } catch (error) {
             console.error('Erreur lors du rafraîchissement du token:', error);
             res.status(401).json({ error: "Token invalide" });
+        }
+    }
+}
+
+module.exports = new AuthController();*/
+
+
+const { auth, db } = require('../../services/firebase');
+const Personne = require('../../models/Personne');
+const bcrypt = require('bcrypt');
+const {createPersonne} = require("../../models/Personne");
+
+class AuthController {
+    /*async registerUser(req, res) {
+        try {
+            const { nom, email, motDePasse, telephone, adresse, role } = req.body;
+
+            if (!email || !motDePasse) {
+                return res.status(422).json({ error: "Email et mot de passe requis" });
+            }
+
+            // Vérifie si l'utilisateur existe déjà
+            try {
+                await auth.getUserByEmail(email);
+                return res.status(409).json({ error: "Utilisateur déjà existant" });
+            } catch (err) {
+                // L'utilisateur n'existe pas, on continue
+            }
+
+            // Hash le mot de passe avant de l'enregistrer
+            const hashedPassword = await bcrypt.hash(motDePasse, 10);
+
+            // Créer l’utilisateur Firebase via Admin SDK
+            const userRecord = await auth.createUser({
+                email,
+                password: motDePasse,
+                displayName: nom
+            });
+
+            // Enregistrer dans la table Personne
+            await Personne.create({
+                id: userRecord.uid, // uid Firebase
+                nom,
+                email,
+                telephone,
+                adresse,
+                mot_de_passe: hashedPassword,
+                role: role || "USER"
+            });
+
+            res.status(201).json({
+                message: "Utilisateur créé dans Firebase + Base de données",
+                userId: userRecord.uid
+            });
+
+        } catch (error) {
+            console.error("Erreur inscription :", error);
+            res.status(500).json({ error: error.message });
+        }
+    }*/
+
+    async registerUser(req, res) {
+        try {
+            const { nom, email, motDePasse, telephone, adresse, role } = req.body;
+            if (!email || !motDePasse) {
+                return res.status(422).json({ error: "Email et mot de passe requis" });
+            }
+
+            // Créer l'utilisateur Firebase
+            const userCredential = await auth.createUser({ email, password: motDePasse });
+            const user = userCredential;
+
+            // Hash le mot de passe avant de l'enregistrer
+            const hashedPassword = await bcrypt.hash(motDePasse, 10);
+
+            // Ajouter dans Firestore
+            await createPersonne({
+                id: user.uid,
+                nom,
+                email,
+                telephone,
+                adresse,
+                motDePasse: hashedPassword,
+                role
+            });
+
+            res.status(201).json({
+                message: "Utilisateur créé avec succès dans Firebase + Firestore",
+                userId: user.uid
+            });
+        } catch (error) {
+            console.error("Erreur inscription :", error);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async loginUser(req, res) {
+        try {
+            const { email, motDePasse } = req.body;
+
+            if (!email || !motDePasse) {
+                return res.status(422).json({ error: "Email et mot de passe requis" });
+            }
+
+
+            const userRecord = await auth.getUserByEmail(email);
+
+            // Optionnel : récupérer des infos supplémentaires depuis Firestore
+            const userDoc = await db.collection("personnes").doc(userRecord.uid).get();
+            const userData = userDoc.exists ? userDoc.data() : {};
+
+            // Générer un token personnalisé pour l'utilisateur
+            const customToken = await auth.createCustomToken(userRecord.uid);
+
+            res.status(200).json({
+                message: "Connexion réussie",
+                user: {
+                    uid: userRecord.uid,
+                    email: userRecord.email,
+                    displayName: userRecord.displayName,
+                    ...userData
+                },
+                customToken
+            });
+
+        } catch (error) {
+            console.error("Erreur login :", error);
+            res.status(500).json({ error: error.message });
         }
     }
 }

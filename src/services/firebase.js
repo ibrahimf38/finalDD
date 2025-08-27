@@ -1,4 +1,5 @@
 /*
+/!*
 /!*const admin = require("firebase-admin");
 const serviceAccount = require("../../config/serviceAccountKey.json");
 
@@ -47,7 +48,7 @@ module.exports = {
     sendEmailVerification,
     sendPasswordResetEmail,
 };
-*/
+*!/
 
 
 const admin = require("firebase-admin");
@@ -62,6 +63,7 @@ const { initializeApp } = require("firebase/app");
 // Configuration Firebase Admin SDK
 const serviceAccount = require("../../config/serviceAccountKey.json");
 
+// Vérifier si une app existe déjà
 if (!admin.apps.length) {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
@@ -89,4 +91,25 @@ module.exports = {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     sendEmailVerification
+};*/
+
+const admin = require("firebase-admin");
+const serviceAccount = require("../../config/serviceAccountKey.json");
+
+// Vérifie si aucune app n’est déjà initialisée
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+    });
+}
+
+// Firestore et Auth via Admin SDK
+const db = admin.firestore();
+const auth = admin.auth();
+
+module.exports = {
+    admin,
+    db,
+    auth,
 };
+

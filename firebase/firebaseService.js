@@ -1,3 +1,4 @@
+/*
 const admin = require("./firebaseConfig"); // Importation de la configuration Firebase
 
 // Fonction pour récupérer les données d'un utilisateur dans Firestore
@@ -9,17 +10,13 @@ const getUserData = async (userId) => {
   }
   return doc.data();
 };
+*/
 
-// Fonction pour créer un utilisateur
-//const createUser = async (email, password) => {
-// const userRecord = await admin.auth().createUser({
-//  email: email,
-// password: password,
-// });
-//return userRecord;
-//};
+const admin = require("../firebase/firebaseConfig"); // import unique
+const { db, auth } = require("../config/db");
 
-//module.exports = {
-//getUserData,
-//createUser,
-//};
+/*// Firestore et Auth
+const db = admin.firestore();
+const auth = admin.auth();*/
+
+module.exports = { admin, db, auth };
