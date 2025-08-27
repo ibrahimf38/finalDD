@@ -88,14 +88,14 @@ const collection = db.collection("Evenement");
 // Ajouter un Evenement
 const createEvenement = async (req, res) => {
   try {
-    const { Nom, description, date, lieu } = req.body;
+    const { nom, description, date, lieu } = req.body;
 
-    if (!Nom || !date || !lieu) {
+    if (!nom || !date || !lieu) {
       return res.status(400).json({ error: "Nom, date et lieu sont requis." });
     }
 
     const docRef = await collection.add({
-      Nom,
+      nom,
       description: description || "",
       date,
       lieu,

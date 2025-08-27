@@ -37,7 +37,7 @@ const addGestionnaire = async (req, res) => {
 // Lire tous les gestionnaires
 const getGestionnaires = async (req, res) => {
   try {
-    const snapshot = await db.collection("gestionnaires").get();
+    const snapshot = await db.collection("Gestionnaire").get();
     const gestionnaires = snapshot.docs.map((doc) => {
       const data = doc.data();
       delete data.motDePasse; // Ne jamais exposer les mots de passe
@@ -63,7 +63,7 @@ const updateGestionnaire = async (req, res) => {
       updateData.motDePasse = await bcrypt.hash(motDePasse, 10);
     }
 
-    await db.collection("gestionnaires").doc(id).update(updateData);
+    await db.collection("Gestionnaire").doc(id).update(updateData);
     res.status(200).json({ message: "Gestionnaire mis à jour avec succès." });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -74,7 +74,7 @@ const updateGestionnaire = async (req, res) => {
 const deleteGestionnaire = async (req, res) => {
   try {
     const { id } = req.params;
-    await db.collection("gestionnaires").doc(id).delete();
+    await db.collection("Gestionnaire").doc(id).delete();
     res.status(200).json({ message: "Gestionnaire supprimé avec succès." });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -1,6 +1,8 @@
 const { admin, db, auth } = require("../services/firebase.js");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
+const firebase = require("../services/firebase")
+
 
 const addAdministrateurController = {
   // Ajouter un administrateur
@@ -101,6 +103,18 @@ const addAdministrateurController = {
       res.status(500).json({ error: error.message });
     }
   },
+
+  async login(req, res) {
+      if (!res.body.email || !res.body.motDePasse){
+          return res.status(422).json({
+              email: "email is obligatoire",
+              motDePasse: "mot de passe est obligatoire"
+          });
+      }
+      firebase
+          .auth
+  }
 };
+
 
 module.exports = addAdministrateurController;

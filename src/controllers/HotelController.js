@@ -91,19 +91,25 @@ const collection = db.collection("Hotel");
 // Ajouter un hôtel
 const createHotel = async (req, res) => {
   try {
-    const { nom, adresse, ville, etoiles, description } = req.body;
+    const {name,location,ownerFirstName,ownerLastName,phone,email,description,room,payment,image,rating} = req.body;
 
-    if (!nom || !adresse || !ville) {
+    if (!name || !location) {
       return res
         .status(400)
-        .json({ error: "Nom, adresse et ville sont requis." });
+        .json({ error: "Nom, adresse sont requis." });
     }
 
     const docRef = await collection.add({
-      nom,
-      adresse,
-      ville,
-      etoiles: etoiles || null,
+      name,
+      location,
+      ownerFirstName,
+      ownerLastName,
+      phone,
+      email,
+        payment,
+        image: image || "",
+        rating: rating || null,
+        room: room || null,
       description: description || "",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -119,7 +125,7 @@ const createHotel = async (req, res) => {
 // Récupérer tous les hôtels
 const getHotels = async (req, res) => {
   try {
-    const snapshot = await collection.orderBy("nom").get();
+    const snapshot = await collection.orderBy("name").get();
     const data = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),

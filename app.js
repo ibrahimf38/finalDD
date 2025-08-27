@@ -15,12 +15,15 @@ const app = express();
 const profilRoutes = require("./src/routes/profil.routes");
 const utilisateurRoutes = require("./src/routes/utilisateur.routes");
 const administrateurRoutes = require("./src/routes/administrateur.routes");
+const authRoutes = require("./src/routes/auth.routes");
 const restaurantRoutes = require("./src/routes/restaurant.routes");
 const evenementRoutes = require("./src/routes/evenement.routes");
 const activitesRoutes = require("./src/routes/activites.routes");
 const reservationsRoutes = require("./src/routes/reservation.routes");
 const hotelRoutes = require("./src/routes/hotel.routes");
-
+const commandesRoutes = require("./src/routes/Commande.routes");
+const gestionnairesRoutes = require("./src/routes/Gestionnaire.routes");
+const swaggerDocs = require("./config/swagger");
 
 // Middlewares
 app.use(cors());
@@ -31,19 +34,26 @@ app.use(bodyParser.json());
 app.use("/api/profil", profilRoutes);
 app.use("/api/utilisateurs", utilisateurRoutes);
 app.use("/api/admin", administrateurRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/evenements", evenementRoutes);
 app.use("/api/activites", activitesRoutes);
 app.use("/api/reservations", reservationsRoutes);
+app.use("/api/commandes", commandesRoutes);
+app.use("/api/gestionnaires", gestionnairesRoutes);
 
 // Routes de test simples
 app.get("/", (req, res) => {
   res.send("Bienvenue sur l'API !");
 });
 
+
 // Démarrage du serveur
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Serveur démarré à l'adresse : http://localhost:${PORT}`);
 });
+
+// Swagger docs
+swaggerDocs(app, PORT);

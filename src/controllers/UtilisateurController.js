@@ -21,7 +21,7 @@ const addUtilisateur = async (req, res) => {
 //Lire tous les utilisateurs
 const getUtilisateurs = async (req, res) => {
   try {
-    const snapshot = await db.collection("utilisateurs").get();
+    const snapshot = await db.collection("utilisateur").get();
     const utilisateurs = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -37,7 +37,7 @@ const updateUtilisateur = async (req, res) => {
   try {
     const { id } = req.params;
     const { nom, email } = req.body;
-    await db.collection("utilisateurs").doc(id).update({ nom, email });
+    await db.collection("utilisateur").doc(id).update({ nom, email });
     res.status(200).send("Utilisateur mis à jour");
   } catch (error) {
     res.status(500).send(error.message);
@@ -48,7 +48,7 @@ const updateUtilisateur = async (req, res) => {
 const deleteUtilisateur = async (req, res) => {
   try {
     const { id } = req.params;
-    await db.collection("utilisateurs").doc(id).delete();
+    await db.collection("utilisateur").doc(id).delete();
     res.status(200).send("Utilisateur supprimé");
   } catch (error) {
     res.status(500).send(error.message);
