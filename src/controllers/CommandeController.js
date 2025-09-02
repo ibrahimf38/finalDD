@@ -18,14 +18,12 @@ const CommandeController = {
       const {
         id_utilisateur,
         id_restaurant,
-        id_gestionnaire,
         qte_commande,
         date_commande,
       } = req.body;
       if (
         !id_utilisateur ||
         !id_restaurant ||
-        !id_gestionnaire ||
         !qte_commande
       ) {
         return res.status(400).json({
@@ -37,7 +35,6 @@ const CommandeController = {
       const docRef = await db.collection("commandes").add({
         id_utilisateur,
         id_restaurant,
-        id_gestionnaire,
         qte_commande,
         date_commande: date_commande ? new Date(date_commande) : new Date(),
         createdAt: admin.firestore.FieldValue.serverTimestamp(),

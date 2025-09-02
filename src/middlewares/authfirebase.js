@@ -53,51 +53,52 @@ module.exports = verifyToken;
 // ==========================================
 // 3. middlewares/authfirebase.js - Middleware d'authentification
 // ==========================================
-const { admin } = require("../services/firebase");
-
-const verifyFirebaseToken = async (req, res, next) => {
+const authFirebase = async (req, res, next) => {
     try {
-        // Essayer d'obtenir le token depuis l'en-tête Authorization
-        const authHeader = req.headers.authorization;
-        let idToken = authHeader?.startsWith("Bearer ")
-            ? authHeader.split(" ")[1]
-            : null;
+        let idToken = null;
 
-        // Si pas de token dans l'en-tête, essayer les cookies
-        if (!idToken) {
+        //  Récupérer le token depuis l'en-tête Authorization
+        const authHeader = req.headers.authorization;
+        if (authHeader?.startsWith("Bearer ")) {
+            idToken = authHeader.split(" ")[1];
+        }
+
+        //  Si pas trouvé, essayer dans les cookies
+        if (!idToken && req.cookies?.access_token) {
             idToken = req.cookies.access_token;
         }
 
+        //  Si toujours pas de token → accès refusé
         if (!idToken) {
-            return res.status(401).json({ error: "Token d'authentification manquant" });
+            return res.status(401).json({ error: "Token d'authentification manquant. Connectez-vous." });
         }
 
-        // Vérifier le token
+        //  Vérifier le token avec Firebase Admin
         const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-        // Ajouter les informations utilisateur à la requête
+        // Attacher les infos utilisateur à la requête
         req.user = {
-            uid: decodedToken.uid,
+            uid: decodedToken.uid,          // Identifiant unique Firebase
             email: decodedToken.email,
-            emailVerified: decodedToken.email_verified
+            emailVerified: decodedToken.email_verified || false,
         };
 
-        next();
+        next(); // passe au contrôleur
     } catch (error) {
-        console.error('Erreur de vérification du token:', error);
+        console.error("Erreur authFirebase:", error);
 
-        let errorMessage = "Token invalide";
-        if (error.code === 'auth/id-token-expired') {
-            errorMessage = "Token expiré";
-        } else if (error.code === 'auth/argument-error') {
-            errorMessage = "Format de token invalide";
+        let errorMessage = "Token invalide ou non autorisé.";
+        if (error.code === "auth/id-token-expired") {
+            errorMessage = "Token expiré. Veuillez vous reconnecter.";
+        } else if (error.code === "auth/argument-error") {
+            errorMessage = "Format du token invalide.";
         }
 
         return res.status(403).json({
             error: errorMessage,
-            code: error.code
+            code: error.code || "auth/unknown-error",
         });
     }
 };
 
-module.exports = verifyFirebaseToken;
+module.exports = authFirebase;
