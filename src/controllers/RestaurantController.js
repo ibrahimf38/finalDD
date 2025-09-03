@@ -91,16 +91,23 @@ const collection = db.collection("Restaurant");
 // Ajouter un restaurant
 const createRestaurant = async (req, res) => {
   try {
-    const { nom, adresse, ville, description } = req.body;
+    const { nom, localisation, description, ownerFirstName, ownerLastName, phone, plat, price, quantity,payment, image } = req.body;
 
-    if (!nom || !adresse || !ville) {
+    if (!nom || !localisation ) {
       return res.status(400).json({ error: "Nom, adresse et ville sont requis." });
     }
 
     const docRef = await collection.add({
       nom,
-      adresse,
-      ville,
+      localisation,
+      ownerFirstName,
+      ownerLastName,
+      phone,
+      plat,
+      price,
+      quantity,
+      payment,
+      image: image || "",
       description: description || "",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });

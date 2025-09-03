@@ -19,7 +19,6 @@ class Restaurant {
         this.id_restaurant = id_restaurant;
         this.id_gestionnaire = id_gestionnaire;
         this.nom = nom;
-        this.adresse = adresse;
         this.description = description;
         this.email = email;
         this.localisation = localisation;
