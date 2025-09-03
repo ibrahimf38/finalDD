@@ -1,9 +1,7 @@
+
 const express = require("express");
 const router = express.Router();
 const { admin, db } = require("../services/firebase.js");
-
-const collection = db.collection("Reservation");
-
 const { validationResult } = require("express-validator");
 
 const ReservationController = {
@@ -15,20 +13,34 @@ const ReservationController = {
         }
 
         try {
-            const { restaurantId, date, nombrePersonnes, statut } = req.body;
+            const {
+                id_restaurant,
+                id_hotel,
+                id_evenement,
+                id_activite,
+                date_reservation,
+                nbre_personne,
+            } = req.body;
 
-            if (!restaurantId || !date || !nombrePersonnes) {
-                return res
-                    .status(400)
-                    .json({ error: "Tous les champs requis doivent être remplis." });
+            // Vérification des champs requis (au moins date et nombre de personnes)
+            if (!date_reservation || !nbre_personne) {
+                return res.status(400).json({
+                    error: "Les champs 'date_reservation' et 'nbre_personne' sont obligatoires.",
+                });
             }
 
+            // uid récupéré automatiquement via authFirebase (utilisateur connecté)
+            const utilisateurId = req.user?.uid || null;
+
             const docRef = await db.collection("reservations").add({
-                utilisateurId: req.user.uid, // 🔑 Récupéré automatiquement via authFirebase
-                restaurantId,
-                date: new Date(date),
-                nombrePersonnes,
-                statut: statut || "en attente",
+                id_utilisateur: utilisateurId,
+                id_restaurant: id_restaurant || null,
+                id_hotel: id_hotel || null,
+                id_evenement: id_evenement || null,
+                id_activite: id_activite || null,
+                date_reservation: new Date(date_reservation),
+                nbre_personne: nbre_personne || null,
+                statut: "en attente",
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
             });
 
@@ -46,11 +58,11 @@ const ReservationController = {
         try {
             const snapshot = await db
                 .collection("reservations")
-                .orderBy("date", "desc")
+                .orderBy("date_reservation", "desc")
                 .get();
 
             const reservations = snapshot.docs.map((doc) => ({
-                id: doc.id,
+                id_reservation: doc.id,
                 ...doc.data(),
             }));
 
@@ -75,9 +87,7 @@ const ReservationController = {
 
             await docRef.update(updateData);
 
-            res
-                .status(200)
-                .json({ message: "Réservation mise à jour avec succès." });
+            res.status(200).json({ message: "Réservation mise à jour avec succès." });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -95,9 +105,7 @@ const ReservationController = {
 
             await docRef.delete();
 
-            res
-                .status(200)
-                .json({ message: "Réservation supprimée avec succès." });
+            res.status(200).json({ message: "Réservation supprimée avec succès." });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

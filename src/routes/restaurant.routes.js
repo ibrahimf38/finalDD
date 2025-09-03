@@ -23,18 +23,12 @@ const RestaurantController = require("../controllers/RestaurantController");
  *             type: object
  *             required:
  *               - nom
- *               - adresse
- *               - ville
  *             properties:
  *               nom:
  *                 type: string
  *                 example: "Restaurant Le Gourmet"
- *               adresse:
- *                 type: string
- *                 example: "123 Rue des Délices"
- *               ville:
- *                 type: string
- *                 example: "Bamako"
+ *
+ *
  *               description:
  *                 type: string
  *                 example: "Cuisine locale et internationale"
@@ -106,9 +100,7 @@ router.get("/:id", RestaurantController.getRestaurantById);
  *               adresse:
  *                 type: string
  *                 example: "456 Avenue Nouvelle"
- *               ville:
- *                 type: string
- *                 example: "Bamako"
+ *
  *               description:
  *                 type: string
  *                 example: "Cuisine locale et internationale rénovée"

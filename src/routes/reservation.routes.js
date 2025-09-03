@@ -35,8 +35,8 @@ const validateReservation = (req, res, next) => {
  *             required:
  *               - utilisateurId
  *               - restaurantId
- *               - date
- *               - nombrePersonnes
+ *               - date_reservation
+ *               - nbre_personne
  *             properties:
  *               utilisateurId:
  *                 type: string
@@ -44,11 +44,11 @@ const validateReservation = (req, res, next) => {
  *               restaurantId:
  *                 type: string
  *                 example: "64df91bc34ef56gh78ij90kl"
- *               date:
+ *               date_reservation:
  *                 type: string
  *                 format: date-time
  *                 example: "2025-09-21T19:30:00Z"
- *               nombrePersonnes:
+ *               nbre_personne:
  *                 type: integer
  *                 example: 3
  *     responses:
@@ -67,7 +67,7 @@ router.post(
             .withMessage("La date est requise")
             .isISO8601()
             .toDate(),
-        body("nombrePersonnes")
+        body("nbre_personne")
             .isInt({ min: 1 })
             .withMessage("Nombre de personnes invalide"),
     ],
@@ -129,11 +129,11 @@ router.get("/", ReservationController.getReservations);
 router.put(
     "/:id",
     [
-        body("date").optional().isISO8601().withMessage("Date invalide"),
-        body("nombrePersonnes")
+        body("date_reservation").optional().isISO8601().withMessage("date_reservation invalide"),
+        body("nbre_personne")
             .optional()
             .isInt({ min: 1 })
-            .withMessage("Nombre de personnes invalide"),
+            .withMessage("Nombre de personnes de personnes invalide"),
         body("statut")
             .optional()
             .isIn(["en attente", "confirmée", "annulée"])

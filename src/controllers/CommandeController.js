@@ -1,126 +1,123 @@
+
 const express = require("express");
 const router = express.Router();
 const { admin, db } = require("../services/firebase.js");
-
-const collection = db.collection("Commande");
-
 const { validationResult } = require("express-validator");
 
 const CommandeController = {
-  //  Créer une commande
-  async createCommande(req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ erreurs: errors.array() });
-    }
+    // Créer une commande
+    async createCommande(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ erreurs: errors.array() });
+        }
 
-    try {
-      const {
-        id_utilisateur,
-        id_restaurant,
-        qte_commande,
-        date_commande,
-      } = req.body;
-      if (
-        !id_utilisateur ||
-        !id_restaurant ||
-        !qte_commande
-      ) {
-        return res.status(400).json({
-          error: "Tous les champs requis doivent être remplis.",
-        });
-      }
+        try {
+            const {
+                id_utilisateur,
+                id_restaurant,
+                id_gestionnaire,
+                qte_commande,
+                date_commande,
+            } = req.body;
 
-      // Création d'une commande
-      const docRef = await db.collection("commandes").add({
-        id_utilisateur,
-        id_restaurant,
-        qte_commande,
-        date_commande: date_commande ? new Date(date_commande) : new Date(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+            if (!id_utilisateur || !id_restaurant || !id_gestionnaire || !qte_commande) {
+                return res.status(400).json({
+                    error: "Les champs 'id_utilisateur', 'id_restaurant', 'id_gestionnaire' et 'qte_commande' sont obligatoires.",
+                });
+            }
 
-      res.status(201).json({
-        message: "Commande créée avec succès",
-        id: docRef.id,
-      });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+            // Création d'une commande
+            const docRef = await db.collection("commandes").add({
+                id_utilisateur,
+                id_restaurant,
+                id_gestionnaire,
+                qte_commande,
+                date_commande: date_commande ? new Date(date_commande) : new Date(),
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
 
-  //  Récupérer toutes les commandes
-  async getCommandes(req, res) {
-    try {
-      const snapshot = await db
-        .collection("commandes")
-        .orderBy("date_commande", "desc")
-        .get();
+            res.status(201).json({
+                message: "Commande créée avec succès",
+                id_commande: docRef.id,
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
 
-      const commandes = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    // Récupérer toutes les commandes
+    async getCommandes(req, res) {
+        try {
+            const snapshot = await db
+                .collection("commandes")
+                .orderBy("date_commande", "desc")
+                .get();
 
-      res.status(200).json(commandes);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+            const commandes = snapshot.docs.map((doc) => ({
+                id_commande: doc.id,
+                ...doc.data(),
+            }));
 
-  //  Récupérer une commande par ID
-  async getCommandeById(req, res) {
-    try {
-      const docRef = db.collection("commandes").doc(req.params.id);
-      const doc = await docRef.get();
+            res.status(200).json(commandes);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
 
-      if (!doc.exists) {
-        return res.status(404).json({ error: "Commande non trouvée." });
-      }
+    // Récupérer une commande par ID
+    async getCommandeById(req, res) {
+        try {
+            const docRef = db.collection("commandes").doc(req.params.id);
+            const doc = await docRef.get();
 
-      res.status(200).json({ id: doc.id, ...doc.data() });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+            if (!doc.exists) {
+                return res.status(404).json({ error: "Commande non trouvée." });
+            }
 
-  //  Mettre à jour une commande
-  async updateCommande(req, res) {
-    try {
-      const docRef = db.collection("commandes").doc(req.params.id);
-      const doc = await docRef.get();
+            res.status(200).json({ id_commande: doc.id, ...doc.data() });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
 
-      if (!doc.exists) {
-        return res.status(404).json({ error: "Commande non trouvée." });
-      }
+    // Mettre à jour une commande
+    async updateCommande(req, res) {
+        try {
+            const docRef = db.collection("commandes").doc(req.params.id);
+            const doc = await docRef.get();
 
-      const updateData = { ...req.body };
-      updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+            if (!doc.exists) {
+                return res.status(404).json({ error: "Commande non trouvée." });
+            }
 
-      await docRef.update(updateData);
+            const updateData = { ...req.body };
+            updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
 
-      res.status(200).json({ message: "Commande mise à jour avec succès." });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+            await docRef.update(updateData);
 
-  //Supprimer une commande
-  async deleteCommande(req, res) {
-    try {
-      const docRef = db.collection("commandes").doc(req.params.id);
-      const doc = await docRef.get();
+            res.status(200).json({ message: "Commande mise à jour avec succès." });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
 
-      if (!doc.exists) {
-        return res.status(404).json({ error: "Commande non trouvée." });
-      }
+    // Supprimer une commande
+    async deleteCommande(req, res) {
+        try {
+            const docRef = db.collection("commandes").doc(req.params.id);
+            const doc = await docRef.get();
 
-      await docRef.delete();
-      res.status(200).json({ message: "Commande supprimée avec succès." });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+            if (!doc.exists) {
+                return res.status(404).json({ error: "Commande non trouvée." });
+            }
+
+            await docRef.delete();
+            res.status(200).json({ message: "Commande supprimée avec succès." });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
 };
 
 module.exports = CommandeController;
