@@ -14,22 +14,22 @@ const CommandeController = {
 
         try {
             const {
-                id_utilisateur,
+                id_personne,
                 id_restaurant,
                 id_gestionnaire,
                 qte_commande,
                 date_commande,
             } = req.body;
 
-            if (!id_utilisateur || !id_restaurant || !id_gestionnaire || !qte_commande) {
+            if (!id_personne || !id_restaurant || !id_gestionnaire || !qte_commande) {
                 return res.status(400).json({
-                    error: "Les champs 'id_utilisateur', 'id_restaurant', 'id_gestionnaire' et 'qte_commande' sont obligatoires.",
+                    error: "Les champs 'id_personne', 'id_restaurant', 'id_gestionnaire' et 'qte_commande' sont obligatoires.",
                 });
             }
 
             // Création d'une commande
             const docRef = await db.collection("commandes").add({
-                id_utilisateur,
+                id_personne,
                 id_restaurant,
                 id_gestionnaire,
                 qte_commande,
