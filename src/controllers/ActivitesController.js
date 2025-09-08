@@ -7,9 +7,10 @@ const createActivite = async (req, res) => {
     try {
         const {
             nom,
-            type_activite,
-            lieu,
-            contact,
+            latitude,
+            longitude,
+            location,
+            phone,
             email,
             description,
             prix,
@@ -18,27 +19,45 @@ const createActivite = async (req, res) => {
             image,
         } = req.body;
 
-        if (!nom || !lieu) {
+        if (!nom || !location) {
             return res.status(400).json({ error: "Nom et lieu sont requis." });
+        }
+
+        let imageUrl = "";
+
+        if (req.file) {
+            const bucket = admin.storage().bucket();
+            const filename = `activites/${Date.now()}_${req.file.originalname}`;
+            const file = bucket.file(filename);
+
+            await file.save(req.file.buffer, {
+                metadata: { contentType: req.file.mimetype },
+            });
+
+            // Rendre le fichier public
+            await file.makePublic();
+            imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`;
         }
 
         const docRef = await collection.add({
             nom,
-            type_activite: type_activite || "",
-            lieu,
-            contact: contact || "",
+            latitude,
+            longitude,
+            location,
+            phone: phone || "",
             email: email || "",
             description: description || "",
             prix: prix || 0,
             payment: payment || "non spécifié",
             category: category || "autre",
-            image: image || "",
+            image: imageUrl,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
         res.status(201).json({
             message: "Activité ajoutée avec succès",
             id_activite: docRef.id,
+            image: imageUrl,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

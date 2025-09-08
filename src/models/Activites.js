@@ -2,9 +2,8 @@ class Activite {
     constructor(
         id_activite,
         nom,
-        type_activite,
-        lieu,
-        contact,
+        location,
+        phone,
         email,
         description,
         prix,
@@ -14,9 +13,8 @@ class Activite {
     ) {
         this.id_activite = id_activite;
         this.nom = nom;
-        this.type_activite = type_activite;
-        this.lieu = lieu;
-        this.contact = contact;
+        this.location = location;
+        this.phone = phone;
         this.email = email;
         this.description = description;
         this.prix = prix;

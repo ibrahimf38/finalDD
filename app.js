@@ -24,6 +24,7 @@ const hotelRoutes = require("./src/routes/hotel.routes");
 const commandesRoutes = require("./src/routes/Commande.routes");
 const gestionnairesRoutes = require("./src/routes/Gestionnaire.routes");
 const swaggerDocs = require("./config/swagger");
+const path = require("path");
 
 // Middlewares
 app.use(cors());
@@ -42,6 +43,7 @@ app.use("/api/activites", activitesRoutes);
 app.use("/api/reservations", reservationsRoutes);
 app.use("/api/commandes", commandesRoutes);
 app.use("/api/gestionnaires", gestionnairesRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes de test simples
 app.get("/", (req, res) => {

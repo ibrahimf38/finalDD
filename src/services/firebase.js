@@ -1,115 +1,39 @@
-/*
-/!*
-/!*const admin = require("firebase-admin");
-const serviceAccount = require("../../config/serviceAccountKey.json");
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-
-const db = admin.firestore();
-const auth = admin.auth();
-
-module.exports = { admin, db, auth };*!/
-const {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    sendEmailVerification,
-    sendPasswordResetEmail
-
-} = require("firebase/auth") ;
-
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/serviceAccountKey.json");
 
-// ✅ Vérifie si aucune app n’est déjà initialisée
-if (!admin.apps.length) {
-    admin.initializeApp({
+// ✅ Debug: Vérifiez le contenu du serviceAccount
+console.log("Project ID from serviceAccount:", serviceAccount.project_id);
+
+// ✅ Fermez toutes les apps existantes
+admin.apps.forEach(app => {
+    console.log("Deleting existing app:", app.name);
+    app.delete();
+});
+
+try {
+
+    const app = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
+        storageBucket: "discover-a5ac1.firebasestorage.app",
     });
+
+    const bucket1 = admin.storage().bucket("discover-a5ac1.firebasestorage.app");
+
+    const bucket2 = admin.storage().bucket();
+
+} catch (error) {
+    console.error("❌ Error:", error.message);
+    console.error("Error code:", error.code);
 }
 
 const db = admin.firestore();
 const auth = admin.auth();
-
-module.exports = { admin, db, auth };
-
+const storage = admin.storage();
 
 module.exports = {
     admin,
     db,
     auth,
-    getAuth,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    sendEmailVerification,
-    sendPasswordResetEmail,
+    storage,
+    getBucket: () => admin.storage().bucket("discover-a5ac1.firebasestorage.app"),
 };
-*!/
-
-
-const admin = require("firebase-admin");
-const {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    sendEmailVerification
-} = require("firebase/auth");
-const { initializeApp } = require("firebase/app");
-
-// Configuration Firebase Admin SDK
-const serviceAccount = require("../../config/serviceAccountKey.json");
-
-// Vérifier si une app existe déjà
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-    });
-}
-// Initialiser Firestore
-const db = admin.firestore();
-
-// Configuration Firebase Client SDK pour l'authentification
-const firebaseConfig = {
-    // Vos paramètres de configuration Firebase
-    apiKey: "AIzaSyDzCHg3SlMDM_kmDQGQZYVHaS44rDgoV7Q",
-    authDomain: "your-project.firebaseapp.com",
-    projectId: "malidicover",
-    // ... autres paramètres
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-module.exports = {
-    admin,
-    db,  // ← Important : exporter Firestore
-    auth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    sendEmailVerification
-};*/
-
-const admin = require("firebase-admin");
-const serviceAccount = require("../../config/serviceAccountKey.json");
-
-// Vérifie si aucune app n’est déjà initialisée
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-    });
-}
-
-// Firestore et Auth via Admin SDK
-const db = admin.firestore();
-const auth = admin.auth();
-
-module.exports = {
-    admin,
-    db,
-    auth,
-};
-
