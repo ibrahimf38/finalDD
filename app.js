@@ -13,8 +13,6 @@ const app = express();
 
 // Import des routes
 const profilRoutes = require("./src/routes/profil.routes");
-const utilisateurRoutes = require("./src/routes/utilisateur.routes");
-const administrateurRoutes = require("./src/routes/administrateur.routes");
 const authRoutes = require("./src/routes/auth.routes");
 const restaurantRoutes = require("./src/routes/restaurant.routes");
 const evenementRoutes = require("./src/routes/evenement.routes");
@@ -33,8 +31,6 @@ app.use(bodyParser.json());
 
 // Montage des routes
 app.use("/api/profil", profilRoutes);
-app.use("/api/utilisateurs", utilisateurRoutes);
-app.use("/api/admin", administrateurRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/hotels", hotelRoutes);

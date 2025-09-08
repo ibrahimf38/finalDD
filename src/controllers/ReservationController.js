@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 const { admin, db } = require("../services/firebase.js");
@@ -29,11 +28,11 @@ const ReservationController = {
                 });
             }
 
-            // uid récupéré automatiquement via authFirebase (utilisateur connecté)
-            const utilisateurId = req.user?.uid || null;
+            // Récupération de l'UID automatiquement via authFirebase
+            const utilisateurId = req.user.uid;
 
             const docRef = await db.collection("reservations").add({
-                id_utilisateur: utilisateurId,
+                id_personne: personneId,
                 id_restaurant: id_restaurant || null,
                 id_hotel: id_hotel || null,
                 id_evenement: id_evenement || null,

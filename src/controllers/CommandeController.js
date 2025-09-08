@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 const { admin, db } = require("../services/firebase.js");
@@ -14,18 +13,21 @@ const CommandeController = {
 
         try {
             const {
-                id_personne,
                 id_restaurant,
                 id_gestionnaire,
                 qte_commande,
                 date_commande,
             } = req.body;
 
-            if (!id_personne || !id_restaurant || !id_gestionnaire || !qte_commande) {
+            // Vérification des champs obligatoires
+            if (!id_restaurant || !id_gestionnaire || !qte_commande) {
                 return res.status(400).json({
-                    error: "Les champs 'id_personne', 'id_restaurant', 'id_gestionnaire' et 'qte_commande' sont obligatoires.",
+                    error: "Les champs 'id_restaurant', 'id_gestionnaire' et 'qte_commande' sont obligatoires.",
                 });
             }
+
+            // Récupération automatique de l'utilisateur connecté
+            const id_personne = req.user.uid;
 
             // Création d'une commande
             const docRef = await db.collection("commandes").add({
