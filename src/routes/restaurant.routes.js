@@ -51,6 +51,18 @@ router.post("/", RestaurantController.createRestaurant);
  *         description: Liste des restaurants
  */
 router.get("/", RestaurantController.getRestaurants);
+/**
+ * @swagger
+ * /api/restaurants/count:
+ *   get:
+ *     summary: Récupérer nombre des Restaurants
+ *     tags: [Count]
+ *     responses:
+ *       200:
+ *         description: Nombre des Restaurants
+ */
+router.get("/count", RestaurantController.countRestaurants);
+
 
 /**
  * @swagger

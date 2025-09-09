@@ -131,6 +131,16 @@ const deleteActivite = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+// Compter le nombre d'Activités
+const countActivites = async (req, res) => {
+    try {
+        const snapshot = await collection.get();
+        const count = snapshot.size;
+        res.status(200).json({ totalActivites: count });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 module.exports = {
     createActivite,
@@ -138,4 +148,5 @@ module.exports = {
     updateActivite,
     deleteActivite,
     getActiviteParId,
+    countActivites
 };

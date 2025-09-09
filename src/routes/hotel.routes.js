@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const HotelController = require("../controllers/HotelController");
+const RestaurantController = require("../controllers/RestaurantController");
 
 /**
  * @swagger
@@ -99,6 +100,17 @@ router.post("/", HotelController.createHotel);
  *         description: Liste des hôtels
  */
 router.get("/", HotelController.getHotels);
+/**
+ * @swagger
+ * /api/hotels/count:
+ *   get:
+ *     summary: Récupérer nombre des hotels
+ *     tags: [Count]
+ *     responses:
+ *       200:
+ *         description: Nombre des Hôtels
+ */
+router.get("/count", HotelController.countHotels);
 
 /**
  * @swagger

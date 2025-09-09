@@ -164,6 +164,16 @@ const deleteEvenement = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+// Compter le nombre d'évènements
+const countEvenements = async (req, res) => {
+    try {
+        const snapshot = await collection.get();
+        const count = snapshot.size;
+        res.status(200).json({ totalEvenements: count });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 module.exports = {
     createEvenement,

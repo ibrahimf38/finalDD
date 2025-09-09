@@ -196,7 +196,6 @@ module.exports = router;*/
 const express = require("express");
 const { body } = require("express-validator");
 const authController = require("../controllers/auth/AuthController");
-
 const router = express.Router();
 
 /**
@@ -276,6 +275,18 @@ router.post(
     ],
     (req, res) => authController.registerUser(req, res)
 );
+
+/**
+ * @swagger
+ * /api/auth/count:
+ *   get:
+ *     summary: Récupérer nombre des personnes
+ *     tags: [Count]
+ *     responses:
+ *       200:
+ *         description: Nombre des personnes
+ */
+router.get("/count", authController.countPersonnes);
 
 /**
  * @swagger

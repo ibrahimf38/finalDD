@@ -190,10 +190,23 @@ const deleteHotel = async (req, res) => {
   }
 };
 
+
+// Compter le nombre d'hôtels
+const countHotels = async (req, res) => {
+    try {
+        const snapshot = await collection.get();
+        const count = snapshot.size;
+        res.status(200).json({ totalHôtels: count });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
-  createHotel,
-  getHotels,
-  getHotelParId,
-  updateHotel,
-  deleteHotel,
+    createHotel,
+    getHotels,
+    getHotelParId,
+    updateHotel,
+    deleteHotel,
+    countHotels
 };

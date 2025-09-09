@@ -136,7 +136,8 @@ module.exports = router;
 const express = require("express");
 const router = express.Router();
 const ActiviteController = require("../controllers/ActivitesController");
-const upload = require("../middlewares/upload"); // multer config (ex: upload.single("image"))
+const upload = require("../middlewares/upload");
+const RestaurantController = require("../controllers/RestaurantController"); // multer config (ex: upload.single("image"))
 
 /**
  * @swagger
@@ -213,6 +214,17 @@ router.post("/", upload.single("image"), ActiviteController.createActivite);
  *         description: Liste des activités
  */
 router.get("/", ActiviteController.getActivites);
+/**
+ * @swagger
+ * /api/activites/count:
+ *   get:
+ *     summary: Récupérer nombre des activites
+ *     tags: [Count]
+ *     responses:
+ *       200:
+ *         description: Nombre des activités
+ */
+router.get("/count", ActiviteController.countActivites);
 
 /**
  * @swagger

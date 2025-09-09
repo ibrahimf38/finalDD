@@ -183,6 +183,8 @@ const { auth, db } = require('../../services/firebase');
 const Personne = require('../../models/Personne');
 const bcrypt = require('bcrypt');
 const {createPersonne} = require("../../models/Personne");
+const collection = db.collection("personnes");
+
 
 class AuthController {
     /*async registerUser(req, res) {
@@ -299,6 +301,19 @@ class AuthController {
             res.status(500).json({ error: error.message });
         }
     }
+
+
+    // Compter le nombre d'Utilisateurs
+     countPersonnes = async (req, res) => {
+        try {
+            const snapshot = await collection.get();
+            const count = snapshot.size;
+            res.status(200).json({ totalPersonnes: count });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    };
 }
+
 
 module.exports = new AuthController();
