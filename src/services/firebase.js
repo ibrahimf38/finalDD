@@ -1,12 +1,8 @@
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/serviceAccountKey.json");
 
-// ✅ Debug: Vérifiez le contenu du serviceAccount
-console.log("Project ID from serviceAccount:", serviceAccount.project_id);
 
-// ✅ Fermez toutes les apps existantes
 admin.apps.forEach(app => {
-    console.log("Deleting existing app:", app.name);
     app.delete();
 });
 

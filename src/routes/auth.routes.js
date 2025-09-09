@@ -215,7 +215,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/auth/register:
+ * /api/auth/register/admin:
  *   post:
  *     summary: Inscription d'un nouvel utilisateur
  *     tags: [Authentification]
@@ -266,7 +266,71 @@ const router = express.Router();
  *         description: Erreur serveur
  */
 router.post(
-    "/register",
+    "/register/admin",
+    [
+        body("nom").notEmpty().withMessage("Le nom est requis"),
+        body("email").isEmail().withMessage("Email invalide"),
+        body("motDePasse")
+            .isLength({ min: 8 })
+            .withMessage("Le mot de passe doit contenir au moins 8 caractères"),
+    ],
+    (req, res) => authController.registerAdmin(req, res)
+);
+
+/**
+ * @swagger
+ * /api/auth/register/user:
+ *   post:
+ *     summary: Inscription d'un nouvel utilisateur
+ *     tags: [Authentification]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nom
+ *               - email
+ *               - motDePasse
+ *             properties:
+ *               nom:
+ *                 type: string
+ *                 example: "Admin Principal"
+ *               email:
+ *                 type: string
+ *                 example: "admin@example.com"
+ *               motDePasse:
+ *                 type: string
+ *                 example: "motdepasse123"
+ *               telephone:
+ *                 type: string
+ *                 example: "12345678"
+ *               adresse:
+ *                 type: string
+ *                 example: "123 Rue Exemple"
+ *               role:
+ *                 type: string
+ *                 example: "USER"
+ *     responses:
+ *       201:
+ *         description: Utilisateur créé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 userId:
+ *                   type: string
+ *       422:
+ *         description: Erreur de validation
+ *       500:
+ *         description: Erreur serveur
+ */
+router.post(
+    "/register/user",
     [
         body("nom").notEmpty().withMessage("Le nom est requis"),
         body("email").isEmail().withMessage("Email invalide"),
