@@ -270,8 +270,8 @@ router.post(
         body("nom").notEmpty().withMessage("Le nom est requis"),
         body("email").isEmail().withMessage("Email invalide"),
         body("motDePasse")
-            .isLength({ min: 8 })
-            .withMessage("Le mot de passe doit contenir au moins 8 caractères"),
+            .isLength({ min:14 })
+            .withMessage("Le mot de passe doit contenir au moins 14 caractères"),
     ],
     (req, res) => authController.registerUser(req, res)
 );
