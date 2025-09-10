@@ -21,6 +21,7 @@ const reservationsRoutes = require("./src/routes/reservation.routes");
 const hotelRoutes = require("./src/routes/hotel.routes");
 const commandesRoutes = require("./src/routes/Commande.routes");
 const gestionnairesRoutes = require("./src/routes/Gestionnaire.routes");
+const menuRoutes = require("./src/routes/menu.routes");
 const swaggerDocs = require("./config/swagger");
 const path = require("path");
 
@@ -39,6 +40,7 @@ app.use("/api/activites", activitesRoutes);
 app.use("/api/reservations", reservationsRoutes);
 app.use("/api/commandes", commandesRoutes);
 app.use("/api/gestionnaires", gestionnairesRoutes);
+app.use("/api/menu", menuRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes de test simples

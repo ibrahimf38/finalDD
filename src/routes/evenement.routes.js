@@ -101,22 +101,22 @@ router.put("/:id", EvenementController.updateEvenement);
 
 /**
  * @swagger
- * /api/evenements/{id}:
+ * /api/menu/{id}:
  *   delete:
- *     summary: Supprimer un événement
- *     tags: [Evenements]
+ *     summary: Supprimer un menu
+ *     tags: [Menu]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID de l'événement à supprimer
+ *         description: ID du menu à supprimer
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Événement supprimé
+ *         description: Menu supprimé avec succès
  *       404:
- *         description: Événement non trouvé
+ *         description: Menu non trouvé
  */
 router.delete("/:id", EvenementController.deleteEvenement);
 

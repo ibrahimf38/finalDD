@@ -13,7 +13,6 @@ class AuthController {
             if (!email || !motDePasse) {
                 return res.status(422).json({ error: "Email et mot de passe requis" });
             }
-
             // Vérifier si l'utilisateur existe déjà
             try {
                 await auth.getUserByEmail(email);
@@ -90,10 +89,6 @@ class AuthController {
             res.status(500).json({ error: error.message });
         }
     }
-
-
-
-
      //Compter le nombre d'Utilisateurs
      countPersonnes = async (req, res) => {
         try {
