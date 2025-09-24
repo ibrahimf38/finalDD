@@ -1,87 +1,4 @@
 const express = require("express");
-// const router = express.Router();
-// const {admin, db} = require("../services/firebase.js");
-
-// const collection = db.collection("Restaurants");
-
-// // Ajouter un Restaurant
-// router.post("/", async (req, res) => {
-//   try {
-//     const { nom, adresse, ville, description } = req.body;
-
-//     if (!nom || !adresse || !ville) {
-//       return res
-//         .status(400)
-//         .json({ error: "Nom, adresse et ville sont requis." });
-//     }
-
-//     const docRef = await collection.add({
-//       nom,
-//       adresse,
-//       ville,
-//       description: description || "",
-//       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-//     });
-
-//     res
-//       .status(201)
-//       .json({ message: "Restaurant ajouté avec succès", id: docRef.id });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-// // Récupérer les Restaurants
-// router.get("/", async (req, res) => {
-//   try {
-//     const snapshot = await collection.orderBy("nom").get();
-//     const data = snapshot.docs.map((doc) => ({
-//       id: doc.id,
-//       ...doc.data(),
-//     }));
-//     res.status(200).json(data);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-// // Modifier un restaurant
-// router.put("/:id", async (req, res) => {
-//   try {
-//     const docRef = collection.doc(req.params.id);
-//     const doc = await docRef.get();
-
-//     if (!doc.exists) {
-//       return res.status(404).json({ error: "restaurant non trouvé." });
-//     }
-
-//     await docRef.update({
-//       ...req.body,
-//       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-//     });
-
-//     res.status(200).json({ message: "restaurant modifié avec succès." });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-// // Supprimer un restaurant
-// router.delete("/:id", async (req, res) => {
-//   try {
-//     const docRef = collection.doc(req.params.id);
-//     const doc = await docRef.get();
-
-//     if (!doc.exists) {
-//       return res.status(404).json({ error: "restaurant non trouvé." });
-//     }
-
-//     await docRef.delete();
-//     res.status(200).json({ message: "restaurant supprimé avec succès." });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
 
 // module.exports = router;
 const { admin, db } = require("../services/firebase.js");
@@ -108,6 +25,22 @@ const createRestaurant = async (req, res) => {
             return res.status(400).json({ error: "Nom et localisation sont requis." });
         }
 
+        let imageUrl = "";
+
+        if (req.file) {
+            const bucket = admin.storage().bucket();
+            const filename = `restaurant/${Date.now()}_${req.file.originalname}`;
+            const file = bucket.file(filename);
+
+            await file.save(req.file.buffer, {
+                metadata: { contentType: req.file.mimetype },
+            });
+
+            // Rendre le fichier public
+            await file.makePublic();
+            imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`;
+        }
+
         const docRef = await collection.add({
             nom,
             localisation,
@@ -118,12 +51,12 @@ const createRestaurant = async (req, res) => {
             price,
             quantity,
             payment,
-            image: image || "",
+            image: imageUrl,
             description: description || "",
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-        res.status(201).json({ message: "Restaurant ajouté avec succès", id: docRef.id });
+        res.status(201).json({ message: "Restaurant ajouté avec succès", image: imageUrl, id: docRef.id });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

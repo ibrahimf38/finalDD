@@ -183,9 +183,6 @@ const RestaurantController = require("../controllers/RestaurantController"); // 
  *               email:
  *                 type: string
  *                 example: "email@gmail.com"
- *               prix:
- *                 type: number
- *                 example: 12000
  *               payment:
  *                 type: string
  *                 example: "orange"

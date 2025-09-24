@@ -2,71 +2,13 @@ const express = require("express");
 const router = express.Router();
 const HotelController = require("../controllers/HotelController");
 const RestaurantController = require("../controllers/RestaurantController");
+const upload = require("../middlewares/upload");
 
 /**
  * @swagger
  * tags:
  *   name: Hotels
  *   description: Gestion des hôtels
- */
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Hotel:
- *       type: object
- *       required:
- *         - id_gestionnaire
- *         - name
- *         - location
- *         - ownerFirstName
- *         - ownerLastName
- *         - phone
- *         - email
- *       properties:
- *         id_hotel:
- *           type: string
- *           description: ID de l'hôtel
- *           example: "64df90ab12cd3e4567ef89ab"
- *         id_gestionnaire:
- *           type: string
- *           description: ID du gestionnaire
- *           example: "64df91bc34ef56gh78ij90kl"
- *         name:
- *           type: string
- *           example: "Hotel Plaza"
- *         location:
- *           type: string
- *           example: "123 Rue Principale, Bamako"
- *         ownerFirstName:
- *           type: string
- *           example: "Moussa"
- *         ownerLastName:
- *           type: string
- *           example: "Traoré"
- *         phone:
- *           type: string
- *           example: "+22370000000"
- *         email:
- *           type: string
- *           example: "hotelplaza@example.com"
- *         description:
- *           type: string
- *           example: "Hôtel 4 étoiles avec piscine et restaurant"
- *         room:
- *           type: integer
- *           example: 120
- *         payment:
- *           type: string
- *           example: "Carte bancaire, Mobile Money"
- *         image:
- *           type: string
- *           example: "https://exemple.com/images/hotel.jpg"
- *         rating:
- *           type: number
- *           format: float
- *           example: 4.5
  */
 
 /**
@@ -78,16 +20,60 @@ const RestaurantController = require("../controllers/RestaurantController");
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Hotel'
+ *             type: object
+ *             required:
+ *               - name
+ *               - location
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Hôtel Le Palace"
+ *               location:
+ *                 type: string
+ *                 example: "Nice, France"
+ *               ownerFirstName:
+ *                 type: string
+ *                 example: "Pierre"
+ *               ownerLastName:
+ *                 type: string
+ *                 example: "Martin"
+ *               phone:
+ *                 type: string
+ *                 example: "+33 4 93 12 34 56"
+ *               email:
+ *                 type: string
+ *                 example: "contact@palace.com"
+ *               description:
+ *                 type: string
+ *                 example: "Hôtel de luxe avec vue sur la mer"
+ *               room:
+ *                 type: integer
+ *                 example: 120
+ *               payment:
+ *                 type: string
+ *                 example: "Carte bancaire, Espèces"
+ *               price:
+ *                 type: number
+ *                 example: 12000
+ *               rating:
+ *                 type: number
+ *                 format: float
+ *                 example: 4.5
+ *               image:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Hôtel créé avec succès
  *       400:
  *         description: Erreur de validation
+ *       500:
+ *         description: Erreur interne du serveur
  */
-router.post("/", HotelController.createHotel);
+router.post("/", upload.single("image"), HotelController.createHotel);
+
 
 /**
  * @swagger
