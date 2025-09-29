@@ -32,7 +32,7 @@ const ReservationController = {
             const utilisateurId = req.user.uid;
 
             const docRef = await db.collection("reservations").add({
-                id_personne: personneId,
+                id_personne: utilisateurId, // Correction: utiliser l'UID Firebase
                 id_restaurant: id_restaurant || null,
                 id_hotel: id_hotel || null,
                 id_evenement: id_evenement || null,
@@ -46,6 +46,32 @@ const ReservationController = {
             res.status(201).json({
                 message: "Réservation créée avec succès",
                 id: docRef.id,
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
+    // Récupérer automatiquement les infos de l'utilisateur connecté
+    async getUserInfo(req, res) {
+        try {
+            // ⚡ Grâce à authFirebase, req.user contient déjà les infos Firebase
+            const user = req.user;
+
+            // Récupérer plus de détails dans Firestore si tu stockes un profil utilisateur
+            const userDoc = await db.collection("users").doc(user.uid).get();
+            let userProfile = {};
+
+            if (userDoc.exists) {
+                userProfile = userDoc.data();
+            }
+
+            res.status(200).json({
+                uid: user.uid,
+                email: user.email,
+                name: user.name || userProfile.name || "",
+                phone: user.phone || userProfile.phone || "",
+                ...userProfile, // merge avec le profil Firestore si besoin
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
