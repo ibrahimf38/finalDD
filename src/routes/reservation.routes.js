@@ -16,8 +16,8 @@ const validateReservation = (req, res, next) => {
 /**
  * @swagger
  * tags:
- *   name: Reservations
- *   description: Gestion des réservations
+ *   - name: Reservations
+ *     description: Gestion des réservations
  */
 
 /**
@@ -25,6 +25,7 @@ const validateReservation = (req, res, next) => {
  * /api/reservations:
  *   post:
  *     summary: Ajouter une nouvelle réservation
+ *     description: Crée une réservation pour un hôtel, un restaurant, un événement ou une activité.
  *     tags: [Reservations]
  *     requestBody:
  *       required: true
@@ -33,15 +34,19 @@ const validateReservation = (req, res, next) => {
  *           schema:
  *             type: object
  *             required:
- *               - utilisateurId
- *               - restaurantId
  *               - date_reservation
  *               - nbre_personne
  *             properties:
- *               utilisateurId:
+ *               id_hotel:
  *                 type: string
- *                 example: "64df90ab12cd3e4567ef89ab"
- *               restaurantId:
+ *                 example: "64df91bc34ef56gh78ij90kl"
+ *               id_restaurant:
+ *                 type: string
+ *                 example: "64df91bc34ef56gh78ij90kl"
+ *               id_evenement:
+ *                 type: string
+ *                 example: "64df91bc34ef56gh78ij90kl"
+ *               id_activite:
  *                 type: string
  *                 example: "64df91bc34ef56gh78ij90kl"
  *               date_reservation:
@@ -52,26 +57,37 @@ const validateReservation = (req, res, next) => {
  *                 type: integer
  *                 example: 3
  *     responses:
- *       201:
+ *       "201":
  *         description: Réservation créée avec succès
- *       400:
+ *       "400":
  *         description: Erreur de validation
+ *       "401":
+ *         description: Non autorisé (authentification manquante)
  */
 router.post(
     "/",
     [
-        body("utilisateurId").notEmpty().withMessage("L'id utilisateur est requis"),
-        body("restaurantId").notEmpty().withMessage("L'id restaurant est requis"),
-        body("date")
+        // Suppression des champs utilisateurId et restaurantId obligatoires du BODY
+        // L'ID utilisateur vient du token, l'ID de ressource est optionnel (hôtel, resto, etc.)
+        body("id_hotel").optional().isString().withMessage("L'id hôtel doit être une chaîne"),
+        body("id_restaurant").optional().isString().withMessage("L'id restaurant doit être une chaîne"),
+        body("id_evenement").optional().isString().withMessage("L'id événement doit être une chaîne"),
+        body("id_activite").optional().isString().withMessage("L'id activité doit être une chaîne"),
+
+        // Validation des champs OBLIGATOIRES pour toutes les réservations
+        body("date_reservation")
             .notEmpty()
-            .withMessage("La date est requise")
+            .withMessage("La date de réservation est requise")
             .isISO8601()
             .toDate(),
         body("nbre_personne")
+            .notEmpty().withMessage("Le nombre de personnes est requis")
             .isInt({ min: 1 })
             .withMessage("Nombre de personnes invalide"),
     ],
     validateReservation,
+    // NOTE TRÈS IMPORTANTE : Vous devez ajouter votre middleware d'authentification ici
+    // Exemple: router.post('/', authMiddleware, validateReservation, ReservationController.createReservation);
     ReservationController.createReservation
 );
 
@@ -82,7 +98,7 @@ router.post(
  *     summary: Récupérer la liste de toutes les réservations
  *     tags: [Reservations]
  *     responses:
- *       200:
+ *       "200":
  *         description: Liste des réservations
  */
 router.get("/", ReservationController.getReservations);
@@ -107,11 +123,11 @@ router.get("/", ReservationController.getReservations);
  *           schema:
  *             type: object
  *             properties:
- *               date:
+ *               date_reservation:
  *                 type: string
  *                 format: date-time
  *                 example: "2025-09-22T19:30:00Z"
- *               nombrePersonnes:
+ *               nbre_personne:
  *                 type: integer
  *                 example: 4
  *               statut:
@@ -119,28 +135,28 @@ router.get("/", ReservationController.getReservations);
  *                 enum: [en attente, confirmée, annulée]
  *                 example: "confirmée"
  *     responses:
- *       200:
+ *       "200":
  *         description: Réservation mise à jour
- *       400:
+ *       "400":
  *         description: Erreur de validation
- *       404:
+ *       "404":
  *         description: Réservation non trouvée
  */
 router.put(
-    "/:id",
-    [
-        body("date_reservation").optional().isISO8601().withMessage("date_reservation invalide"),
-        body("nbre_personne")
-            .optional()
-            .isInt({ min: 1 })
-            .withMessage("Nombre de personnes de personnes invalide"),
-        body("statut")
-            .optional()
-            .isIn(["en attente", "confirmée", "annulée"])
-            .withMessage("Statut invalide"),
-    ],
-    validateReservation,
-    ReservationController.updateReservation
+  "/:id",
+  [
+    body("date_reservation").optional().isISO8601().withMessage("date_reservation invalide"),
+    body("nbre_personne")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Nombre de personnes invalide"),
+    body("statut")
+      .optional()
+      .isIn(["en attente", "confirmée", "annulée"])
+      .withMessage("Statut invalide"),
+  ],
+  validateReservation,
+  ReservationController.updateReservation
 );
 
 /**
@@ -157,9 +173,9 @@ router.put(
  *         schema:
  *           type: string
  *     responses:
- *       200:
+ *       "200":
  *         description: Réservation supprimée
- *       404:
+ *       "404":
  *         description: Réservation non trouvée
  */
 router.delete("/:id", ReservationController.deleteReservation);

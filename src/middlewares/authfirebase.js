@@ -99,6 +99,7 @@ const authFirebase = async (req, res, next) => {
             code: error.code || "auth/unknown-error",
         });
     }
+
 };
 
 module.exports = authFirebase;

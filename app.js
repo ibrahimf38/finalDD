@@ -31,7 +31,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 // Montage des routes
-app.use("/api/profil", profilRoutes);
+app.use("/api", profilRoutes); // ✅ CORRECTION: Montage direct sous /api pour les routes /users/register et /users/login
 app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/hotels", hotelRoutes);
@@ -48,12 +48,13 @@ app.get("/", (req, res) => {
   res.send("Bienvenue sur l'API !");
 });
 
-
 // Démarrage du serveur
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
-  console.log(`Serveur démarré à l'adresse : http://localhost:${PORT}`);
+  console.log(`🚀 Serveur démarré à l'adresse : http://localhost:${PORT}`);
+
+  // Documentation Swagger (passe bien le port ici)
+  swaggerDocs(app, PORT);
 });
 
-// Swagger docs
-swaggerDocs(app, PORT);
+module.exports = app;

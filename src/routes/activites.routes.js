@@ -297,6 +297,6 @@ router.put("/:id", ActiviteController.updateActivite);
  *       404:
  *         description: Activité non trouvée
  */
-router.delete("/:id", ActiviteController.deleteActivite);
+router.delete("/:id", mapController.deleteActivite);
 
 module.exports = router;
