@@ -89,8 +89,8 @@ class AuthController {
             res.status(500).json({ error: error.message });
         }
     }
-     //Compter le nombre d'Utilisateurs
-     countPersonnes = async (req, res) => {
+    //Compter le nombre d'Utilisateurs
+    countPersonnes = async (req, res) => {
         try {
             const snapshot = await collection.get();
             const count = snapshot.size;
