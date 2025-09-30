@@ -40,9 +40,7 @@ const validateReservation = (req, res, next) => {
  *               - date_reservation
  *               - nbre_personne
  *             properties:
-<<<<<<< HEAD
  *               id_restaurant:
-=======
  *               id_hotel:
  *                 type: string
  *                 example: "64df91bc34ef56gh78ij90kl"
@@ -53,7 +51,6 @@ const validateReservation = (req, res, next) => {
  *                 type: string
  *                 example: "64df91bc34ef56gh78ij90kl"
  *               id_activite:
->>>>>>> 0450303384d793addde8694ee5e5bfbc84919c33
  *                 type: string
  *                 example: "64df91bc34ef56gh78ij90kl"
  *               id_hotel:
@@ -78,8 +75,6 @@ router.post(
     "/",
     authFirebase, // protège et ajoute req.user
     [
-<<<<<<< HEAD
-=======
         // Suppression des champs utilisateurId et restaurantId obligatoires du BODY
         // L'ID utilisateur vient du token, l'ID de ressource est optionnel (hôtel, resto, etc.)
         body("id_hotel").optional().isString().withMessage("L'id hôtel doit être une chaîne"),
@@ -88,7 +83,6 @@ router.post(
         body("id_activite").optional().isString().withMessage("L'id activité doit être une chaîne"),
 
         // Validation des champs OBLIGATOIRES pour toutes les réservations
->>>>>>> 0450303384d793addde8694ee5e5bfbc84919c33
         body("date_reservation")
             .notEmpty()
             .withMessage("La date de réservation est requise")
@@ -125,12 +119,9 @@ router.get("/me", authFirebase, ReservationController.getUserInfo);
  *   get:
  *     summary: Récupérer la liste de toutes les réservations
  *     tags: [Reservations]
-<<<<<<< HEAD
-=======
  *     responses:
  *       "200":
  *         description: Liste des réservations
->>>>>>> 0450303384d793addde8694ee5e5bfbc84919c33
  */
 router.get("/", ReservationController.getReservations);
 
@@ -140,7 +131,6 @@ router.get("/", ReservationController.getReservations);
  *   put:
  *     summary: Mettre à jour une réservation
  *     tags: [Reservations]
-<<<<<<< HEAD
  *     security:
  *       - bearerAuth: []
  */
@@ -154,7 +144,6 @@ router.put(
     ],
     validateReservation,
     ReservationController.updateReservation
-=======
  *     parameters:
  *       - in: path
  *         name: id
