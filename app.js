@@ -22,6 +22,7 @@ const hotelRoutes = require("./src/routes/hotel.routes");
 const commandesRoutes = require("./src/routes/Commande.routes");
 const gestionnairesRoutes = require("./src/routes/Gestionnaire.routes");
 const menuRoutes = require("./src/routes/menu.routes");
+
 const swaggerDocs = require("./config/swagger");
 const path = require("path");
 

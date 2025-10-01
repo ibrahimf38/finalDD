@@ -17,8 +17,8 @@ const validateReservation = (req, res, next) => {
 /**
  * @swagger
  * tags:
- *   - name: Reservations
- *     description: Gestion des réservations
+ *   name: Reservations
+ *   description: Gestion des réservations
  */
 
 /**
@@ -26,7 +26,6 @@ const validateReservation = (req, res, next) => {
  * /api/reservations:
  *   post:
  *     summary: Ajouter une nouvelle réservation
- *     description: Crée une réservation pour un hôtel, un restaurant, un événement ou une activité.
  *     tags: [Reservations]
  *     security:
  *       - bearerAuth: []
@@ -41,16 +40,6 @@ const validateReservation = (req, res, next) => {
  *               - nbre_personne
  *             properties:
  *               id_restaurant:
- *               id_hotel:
- *                 type: string
- *                 example: "64df91bc34ef56gh78ij90kl"
- *               id_restaurant:
- *                 type: string
- *                 example: "64df91bc34ef56gh78ij90kl"
- *               id_evenement:
- *                 type: string
- *                 example: "64df91bc34ef56gh78ij90kl"
- *               id_activite:
  *                 type: string
  *                 example: "64df91bc34ef56gh78ij90kl"
  *               id_hotel:
@@ -64,38 +53,58 @@ const validateReservation = (req, res, next) => {
  *                 type: integer
  *                 example: 3
  *     responses:
- *       "201":
+ *       201:
  *         description: Réservation créée avec succès
- *       "400":
+ *       400:
  *         description: Erreur de validation
- *       "401":
- *         description: Non autorisé (authentification manquante)
  */
+/*
 router.post(
     "/",
     authFirebase, // protège et ajoute req.user
     [
-        // Suppression des champs utilisateurId et restaurantId obligatoires du BODY
-        // L'ID utilisateur vient du token, l'ID de ressource est optionnel (hôtel, resto, etc.)
-        body("id_hotel").optional().isString().withMessage("L'id hôtel doit être une chaîne"),
-        body("id_restaurant").optional().isString().withMessage("L'id restaurant doit être une chaîne"),
-        body("id_evenement").optional().isString().withMessage("L'id événement doit être une chaîne"),
-        body("id_activite").optional().isString().withMessage("L'id activité doit être une chaîne"),
-
-        // Validation des champs OBLIGATOIRES pour toutes les réservations
         body("date_reservation")
             .notEmpty()
-            .withMessage("La date de réservation est requise")
+            .withMessage("La date est requise")
             .isISO8601()
             .withMessage("Format de date invalide"),
         body("nbre_personne")
-            .notEmpty().withMessage("Le nombre de personnes est requis")
             .isInt({ min: 1 })
             .withMessage("Nombre de personnes invalide"),
     ],
     validateReservation,
-    // NOTE TRÈS IMPORTANTE : Vous devez ajouter votre middleware d'authentification ici
-    // Exemple: router.post('/', authMiddleware, validateReservation, ReservationController.createReservation);
+    ReservationController.createReservation
+);
+*/
+
+router.post(
+    "/",
+    authFirebase,
+    [
+        // 🚀 Nouvelle validation pour la réservation d'hôtel
+        body("hotel_id")
+            .notEmpty()
+            .withMessage("L'ID de l'hôtel est requis"),
+        body("check_in_date")
+            .notEmpty()
+            .withMessage("La date d'arrivée est requise")
+            .isISO8601()
+            .withMessage("Format de date d'arrivée invalide (ISO8601)"),
+        body("check_out_date")
+            .notEmpty()
+            .withMessage("La date de départ est requise")
+            .isISO8601()
+            .withMessage("Format de date de départ invalide (ISO8601)"),
+        body("quantity")
+            .isInt({ min: 1 })
+            .withMessage("Nombre de chambres invalide (doit être >= 1)"),
+        // Validation optionnelle des autres champs
+        body("total_price").optional().isInt().withMessage("Prix total invalide"),
+        body("name").optional().isString().withMessage("Nom invalide"),
+        body("phone").optional().isString().withMessage("Téléphone invalide"),
+        body("email").optional().isEmail().withMessage("Email invalide"),
+    ],
+    validateReservation,
     ReservationController.createReservation
 );
 
@@ -119,9 +128,6 @@ router.get("/me", authFirebase, ReservationController.getUserInfo);
  *   get:
  *     summary: Récupérer la liste de toutes les réservations
  *     tags: [Reservations]
- *     responses:
- *       "200":
- *         description: Liste des réservations
  */
 router.get("/", ReservationController.getReservations);
 
@@ -144,55 +150,6 @@ router.put(
     ],
     validateReservation,
     ReservationController.updateReservation
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID de la réservation à modifier
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               date_reservation:
- *                 type: string
- *                 format: date-time
- *                 example: "2025-09-22T19:30:00Z"
- *               nbre_personne:
- *                 type: integer
- *                 example: 4
- *               statut:
- *                 type: string
- *                 enum: [en attente, confirmée, annulée]
- *                 example: "confirmée"
- *     responses:
- *       "200":
- *         description: Réservation mise à jour
- *       "400":
- *         description: Erreur de validation
- *       "404":
- *         description: Réservation non trouvée
- */
-router.put(
-  "/:id",
-  [
-    body("date_reservation").optional().isISO8601().withMessage("date_reservation invalide"),
-    body("nbre_personne")
-      .optional()
-      .isInt({ min: 1 })
-      .withMessage("Nombre de personnes invalide"),
-    body("statut")
-      .optional()
-      .isIn(["en attente", "confirmée", "annulée"])
-      .withMessage("Statut invalide"),
-  ],
-  validateReservation,
-  ReservationController.updateReservation
->>>>>>> 0450303384d793addde8694ee5e5bfbc84919c33
 );
 
 /**
@@ -201,23 +158,8 @@ router.put(
  *   delete:
  *     summary: Supprimer une réservation
  *     tags: [Reservations]
-<<<<<<< HEAD
  *     security:
  *       - bearerAuth: []
-=======
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID de la réservation à supprimer
- *         schema:
- *           type: string
- *     responses:
- *       "200":
- *         description: Réservation supprimée
- *       "404":
- *         description: Réservation non trouvée
->>>>>>> 0450303384d793addde8694ee5e5bfbc84919c33
  */
 router.delete("/:id", authFirebase, ReservationController.deleteReservation);
 

@@ -59,7 +59,7 @@ router.post("/users/register", ProfilController.register);
 
 /**
  * @swagger
- * /users/login:
+ * /api/users/login:
  *   post:
  *     summary: Connexion de l'utilisateur
  *     tags: [Authentification et Profils]

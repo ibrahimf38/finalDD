@@ -5,7 +5,7 @@ const { validationResult } = require("express-validator");
 
 const ReservationController = {
     // Créer une réservation
-    async createReservation(req, res) {
+  /*  async createReservation(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ erreurs: errors.array() });
@@ -21,34 +21,24 @@ const ReservationController = {
                 nbre_personne,
             } = req.body;
 
-            // Vérification des champs requis
+            // Vérification des champs requis (au moins date et nombre de personnes)
             if (!date_reservation || !nbre_personne) {
                 return res.status(400).json({
                     error: "Les champs 'date_reservation' et 'nbre_personne' sont obligatoires.",
                 });
             }
 
-            // Récupération de l'UID (doit être fourni par un middleware d'auth, ex: Firebase)
-            const utilisateurId = req.user ? req.user.uid : null;
-
-            if (!utilisateurId) {
-                 // Le serveur renvoie une 401 si l'utilisateur n'est pas authentifié
-                 return res.status(401).json({ error: "Authentification requise. L'ID utilisateur est manquant (jeton non fourni ou invalide)." });
-            }
+            // Récupération de l'UID automatiquement via authFirebase
+            const utilisateurId = req.user.uid;
 
             const docRef = await db.collection("reservations").add({
-<<<<<<< HEAD
                 id_personne: utilisateurId, // Correction: utiliser l'UID Firebase
-=======
-                // CORRECTION: Utilisation de la variable utilisateurId
-                id_personne: utilisateurId,
->>>>>>> 0450303384d793addde8694ee5e5bfbc84919c33
                 id_restaurant: id_restaurant || null,
                 id_hotel: id_hotel || null,
                 id_evenement: id_evenement || null,
                 id_activite: id_activite || null,
                 date_reservation: new Date(date_reservation),
-                nbre_personne: parseInt(nbre_personne, 10) || null,
+                nbre_personne: nbre_personne || null,
                 statut: "en attente",
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
             });
@@ -58,16 +48,72 @@ const ReservationController = {
                 id: docRef.id,
             });
         } catch (error) {
-             console.error("Erreur lors de la création de la réservation:", error);
             res.status(500).json({ error: error.message });
         }
-    },
+    },*/
 
-<<<<<<< HEAD
+        // Créer une réservation
+        async createReservation(req, res) {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ erreurs: errors.array() });
+            }
+
+            try {
+                // 🚀 Champs mis à jour pour correspondre à l'envoi du Flutter (HotelReservationPage)
+                const {
+                    hotel_id,
+                    check_in_date,
+                    check_out_date,
+                    quantity, // nombre de chambres
+                    total_price,
+                    notes,
+                    name,    // Nom du client
+                    phone,   // Téléphone du client
+                    email,   // Email du client
+                    // Note: on a retiré id_restaurant, id_evenement, id_activite car c'est une réservation d'hôtel
+                } = req.body;
+
+                // La validation des champs est principalement faite par le middleware de route
+
+                // Récupération de l'UID automatiquement via authFirebase
+                const utilisateurId = req.user.uid;
+
+                const docRef = await db.collection("reservations").add({
+                    id_personne: utilisateurId,
+                    id_hotel: hotel_id || null, // Utilise le champ hotel_id du front-end
+
+                    // Détails de la réservation hôtelière
+                    date_arrivee: new Date(check_in_date),
+                    date_depart: new Date(check_out_date),
+                    nombre_chambres: quantity,
+                    prix_total: total_price,
+                    notes: notes || null,
+
+                    // Infos client transmises par le front
+                    nom_client: name,
+                    telephone_client: phone,
+                    email_client: email,
+
+                    statut: "en attente",
+                    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                });
+
+                res.status(201).json({
+                    message: "Réservation créée avec succès",
+                    id: docRef.id,
+                });
+            } catch (error) {
+                // Ajout d'un log côté serveur pour le débogage
+                console.error("Erreur détaillée lors de la création de la réservation:", error);
+                res.status(500).json({ error: "Erreur interne du serveur lors de la création: " + error.message });
+            }
+        },
+
     // Récupérer automatiquement les infos de l'utilisateur connecté
     async getUserInfo(req, res) {
         try {
-            // ⚡ Grâce à authFirebase, req.user contient déjà les infos Firebase
+            //  Grâce à authFirebase, req.user contient déjà les infos Firebase
             const user = req.user;
 
             // Récupérer plus de détails dans Firestore si tu stockes un profil utilisateur
@@ -91,9 +137,6 @@ const ReservationController = {
     },
 
     // Récupérer toutes les réservations
-=======
-    // Récupérer toutes les réservations (inchangé)
->>>>>>> 0450303384d793addde8694ee5e5bfbc84919c33
     async getReservations(req, res) {
         try {
             const snapshot = await db
@@ -123,13 +166,6 @@ const ReservationController = {
             }
 
             const updateData = { ...req.body };
-            // CORRECTION: Assurer la bonne conversion des types pour la mise à jour
-             if (updateData.date_reservation) {
-                updateData.date_reservation = new Date(updateData.date_reservation);
-            }
-            if (updateData.nbre_personne) {
-                updateData.nbre_personne = parseInt(updateData.nbre_personne, 10);
-            }
             updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
 
             await docRef.update(updateData);
@@ -140,7 +176,7 @@ const ReservationController = {
         }
     },
 
-    // Supprimer une réservation (inchangé)
+    // Supprimer une réservation
     async deleteReservation(req, res) {
         try {
             const docRef = db.collection("reservations").doc(req.params.id);
